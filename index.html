@@ -13,14 +13,16 @@
   body{font-family:"PingFang SC","Microsoft YaHei","Hiragino Sans GB","Segoe UI",system-ui,sans-serif;
     background:#EDF3F0;color:var(--ink);display:flex;flex-direction:column;overflow:hidden}
   header{background:#fff;border-top:5px solid var(--green);border-bottom:1px solid var(--line);
-    padding:12px 22px;display:flex;align-items:center;gap:13px;flex:none}
+    padding:12px 22px;display:flex;align-items:center;gap:13px;flex:none;position:relative;z-index:40;
+    transition:transform .3s ease,opacity .3s ease}
   .logo{width:40px;height:40px;border-radius:10px;background:var(--green);color:#fff;font-size:19px;
     font-weight:700;display:flex;align-items:center;justify-content:center;flex:none}
   .brand-name{font-size:17px;font-weight:700;color:var(--green-d);line-height:1.3}
   .brand-sub{font-size:12px;color:var(--muted);letter-spacing:2px}
   .head-note{margin-left:auto;font-size:12px;color:var(--muted);text-align:right;line-height:1.5}
   .layout{flex:1;display:flex;min-height:0}
-  .list{width:300px;flex:none;background:#fff;border-right:1px solid var(--line);overflow-y:auto;padding:18px 16px}
+  .list{width:300px;flex:none;background:#fff;border-right:1px solid var(--line);overflow-y:auto;
+    padding:18px 16px;transition:opacity .25s ease}
   .list-title{font-size:12.5px;color:var(--muted);letter-spacing:2px;margin:0 4px 12px}
   .item{display:block;width:100%;text-align:left;background:#FCFEFD;border:1px solid var(--line);
     border-radius:10px;padding:13px 15px;margin-bottom:10px;cursor:pointer;font-family:inherit;
@@ -30,13 +32,27 @@
   .item .d{font-size:15px;font-weight:700;color:var(--green-d)}
   .item .t{font-size:12.5px;color:var(--muted);margin-top:3px;line-height:1.5}
   .content{flex:1;min-width:0;position:relative;background:#fff}
-  iframe#doc{width:100%;height:100%;border:none;display:block}
-  .welcome{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;
+  iframe#doc{width:100%;height:100%;border:none;display:block;position:relative;z-index:1}
+  .welcome{position:absolute;inset:0;z-index:0;display:flex;flex-direction:column;align-items:center;
     justify-content:center;gap:12px;padding:24px;text-align:center}
   .welcome .big{font-size:18px;font-weight:700;color:var(--green-d)}
   .welcome .tip{font-size:14px;color:var(--sub)}
   .welcome .pw{font-size:12.5px;color:var(--muted)}
   .empty{padding:20px 14px;font-size:13px;color:var(--muted);text-align:center;line-height:1.8}
+
+  /* ── 沉浸式阅读模式：标头上滑收起、日期栏隐藏、内容全屏 ── */
+  body.reading header{transform:translateY(-100%);opacity:0;pointer-events:none}
+  body.reading .list{opacity:0;pointer-events:none;visibility:hidden}
+  body.reading .content{position:fixed;inset:0;z-index:50}
+  body.reading iframe#doc{animation:fadeIn .25s ease}
+  @keyframes fadeIn{from{opacity:0}to{opacity:1}}
+  .back-pill{position:fixed;top:14px;left:14px;z-index:60;display:none;align-items:center;gap:5px;
+    background:rgba(255,255,255,.92);border:1px solid var(--line);border-radius:999px;
+    padding:7px 15px;font-size:13px;font-weight:600;color:var(--green-d);cursor:pointer;
+    box-shadow:0 2px 12px rgba(0,60,40,.14);font-family:inherit;transition:background .15s,border-color .15s}
+  body.reading .back-pill{display:inline-flex}
+  .back-pill:hover{background:#fff;border-color:var(--green)}
+
   @media (max-width:720px){
     header{padding:10px 16px}
     .head-note{display:none}
@@ -46,6 +62,7 @@
     .list-title{width:100%}
     .item{width:calc(50% - 5px)}
     .item .d{font-size:14px}
+    .back-pill{top:10px;left:10px;padding:6px 13px;font-size:12.5px}
   }
 </style>
 </head>
@@ -58,6 +75,7 @@
   </div>
   <div class="head-note">内部资料 · 访问需密码<br>请向李老师索取</div>
 </header>
+<button class="back-pill" id="backPill" type="button" title="返回会议列表（Esc）">← 返回列表</button>
 <div class="layout">
   <aside class="list" id="list">
     <div class="list-title">会议日期</div>
@@ -107,10 +125,16 @@ var MEETINGS = [
       var f = document.getElementById('doc');
       f.style.display = 'block';
       f.src = m.file;
+      document.body.classList.add('reading');
     });
     list.appendChild(b);
   });
 })();
+function exitReading() { document.body.classList.remove('reading'); }
+document.getElementById('backPill').addEventListener('click', exitReading);
+document.addEventListener('keydown', function (e) {
+  if (e.key === 'Escape') exitReading();
+});
 </script>
 </body>
 </html>
