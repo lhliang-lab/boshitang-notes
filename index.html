@@ -94,6 +94,10 @@
 var MEETINGS = [
   { date: '2026-10-15', title: '明确分工，重心转向招生', file: 'hyjy/2026-10-15.html' }
 ];
+/* 其它加密页面清单（与会议纪要同一密码）：{ title, desc, file } */
+var PAGES = [
+  { title: '托管人数总览', desc: '各年级人数 · 上课 · 午晚托 · 人员名单', file: 'tuoguan/index.html' }
+];
 (function () {
   var list = document.getElementById('list');
   var titleEl = document.querySelector('.list-title');
@@ -103,32 +107,47 @@ var MEETINGS = [
     p.className = 'empty';
     p.textContent = '会议纪要将按日期归档于此';
     list.appendChild(p);
-    return;
   }
-  MEETINGS.forEach(function (m, i) {
+  function openDoc(file) {
+    document.getElementById('welcome').style.display = 'none';
+    var f = document.getElementById('doc');
+    f.style.display = 'block';
+    f.src = file;
+    document.body.classList.add('reading');
+  }
+  function makeItem(main, sub, file) {
     var b = document.createElement('button');
     b.className = 'item';
     b.type = 'button';
     var d = document.createElement('div');
     d.className = 'd';
-    d.textContent = m.date;
+    d.textContent = main;
     var t = document.createElement('div');
     t.className = 't';
-    t.textContent = m.title;
+    t.textContent = sub;
     b.appendChild(d);
     b.appendChild(t);
     b.addEventListener('click', function () {
       var items = document.querySelectorAll('.item');
       for (var k = 0; k < items.length; k++) items[k].classList.remove('active');
       b.classList.add('active');
-      document.getElementById('welcome').style.display = 'none';
-      var f = document.getElementById('doc');
-      f.style.display = 'block';
-      f.src = m.file;
-      document.body.classList.add('reading');
+      openDoc(file);
     });
-    list.appendChild(b);
+    return b;
+  }
+  MEETINGS.forEach(function (m) {
+    list.appendChild(makeItem(m.date, m.title, m.file));
   });
+  if (PAGES.length) {
+    var sub2 = document.createElement('div');
+    sub2.className = 'list-title';
+    sub2.style.marginTop = '18px';
+    sub2.textContent = '托管台账';
+    list.appendChild(sub2);
+    PAGES.forEach(function (pg) {
+      list.appendChild(makeItem(pg.title, pg.desc, pg.file));
+    });
+  }
 })();
 function exitReading() { document.body.classList.remove('reading'); }
 document.getElementById('backPill').addEventListener('click', exitReading);
