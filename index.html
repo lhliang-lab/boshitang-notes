@@ -96,7 +96,8 @@ var MEETINGS = [
 ];
 /* 其它加密页面清单（与会议纪要同一密码）：{ title, desc, file } */
 var PAGES = [
-  { title: '托管人数总览', desc: '各年级人数 · 上课 · 午晚托 · 人员名单', file: 'tuoguan/index.html' }
+  { title: '托管人数总览', desc: '各年级人数 · 上课 · 午晚托 · 人员名单', file: 'tuoguan/index.html' },
+  { title: '校区上课管理', desc: '周一~周日课表 · 谁在上课 · 哪个教室', file: 'shangke/index.html' }
 ];
 (function () {
   var list = document.getElementById('list');
@@ -142,7 +143,7 @@ var PAGES = [
     var sub2 = document.createElement('div');
     sub2.className = 'list-title';
     sub2.style.marginTop = '18px';
-    sub2.textContent = '托管台账';
+    sub2.textContent = '校区管理';
     list.appendChild(sub2);
     PAGES.forEach(function (pg) {
       list.appendChild(makeItem(pg.title, pg.desc, pg.file));
